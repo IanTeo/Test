@@ -3,31 +3,86 @@
     <head>
         <meta charset="UTF-8" />
         <title>Test</title>
+    </head>
+    <body>
+		
+		<table border='1'>
+		<tr><td width='50' height='50' id='t11' /><td width='50' height='50' id='t12' /><td width='50' height='50' id='t13'/><td width='50' height='50' id='t14' /><td width='50' height='50' id='t15' /></tr>
+		<tr><td width='50' height='50' id='t21' /><td width='50' height='50' id='t22' /><td width='50' height='50' id='t23'/><td width='50' height='50' id='t24' /><td width='50' height='50' id='t25' /></tr>
+		<tr><td width='50' height='50' id='t31' /><td width='50' height='50' id='t32' /><td width='50' height='50' id='t33'/><td width='50' height='50' id='t34' /><td width='50' height='50' id='t35' /></tr>
+		</table>
+		
+		
+		<button type='button' style='width:100px;margin-left:50px' onclick='writeFunction("moveUp();")'>Move Up</button> <br />
+		<button type='button' style='width:100px' onclick='writeFunction("moveLeft();")'>Move Left</button> 
+		<button type='button' style='width:100px' onclick='writeFunction("moveRight();")'>Move Right</button> <br />
+		<button type='button' style='width:100px;margin-left:50px' onclick='writeFunction("moveDown();")'>Move Down</button> <br /> 
+		
+		<button type='button' style='width:100px' onclick='submitFunction()'>Create Script</button>
+		<button type='button' style='width:100px' onclick='runFunction()'>Run Script</button> <br />
+		
+		<div id='writeArea' style='background-color:#AAAAAA;width:200px;height:200px;'>
+		
+		</div>
+		
 		<script type="text/javascript">
 			var sqrRight = 0;
 			var MOVE_SPEED = 25;
+			var curRow = 2;
+			var curCol = 3;
+			var funcText = "";
+			function loadSquare(newRow, newCol){
+				var oldPosition = document.getElementById('t' + curRow + '' + curCol);
+				oldPosition.style.backgroundColor = '#FFFFFF';
+				curRow = newRow;
+				curCol = newCol;
+				var newPosition = document.getElementById('t' + curRow + '' + curCol);
+				newPosition.style.backgroundColor = '#000000';
+			}
 			function moveLeft(){
-				square = document.getElementById('square');
-				sqrRight = sqrRight-10;
-				square.style.left = sqrRight +'px';
+				var newCol;
+				if(curCol != 1){
+					newCol = curCol-1;
+					loadSquare(curRow, newCol);
+				}
 			}
 			function moveRight(){
-				square = document.getElementById('square');
-				sqrRight = sqrRight+10;
-				square.style.left = sqrRight +'px';
+				var newCol;
+				if(curCol != 5){
+					newCol = curCol+1;
+					loadSquare(curRow, newCol);
+				}
 			}
+			function moveUp(){
+				var newRow;
+				if(curRow != 1){
+					newRow = curRow-1;
+					loadSquare(newRow, curCol);
+				}
+			}
+			function moveDown(){
+				var newRow;
+				if(curRow != 3){
+					newRow = curRow+1;
+					loadSquare(newRow, curCol);
+				}
+			}
+			
+			function writeFunction(func){
+				funcText += func;
+				document.getElementById('writeArea').innerHTML = funcText;
+			}
+			
+			function submitFunction(){
+				var script=document.createElement('script');
+				script.type='text/javascript';
+				script.innerHTML = "function runFunction(){" + funcText + "}";
+				//script.src=url;
+
+				document.body.appendChild(script);
+			}
+			
+			loadSquare(curRow, curCol);
 		</script>
-    </head>
-    <body>
-
-		<div id='square' style='background-color:#000000;width:50px;height:50px;position:relative'>
-	
-		</div>
-		
-		<button type='button' onclick='moveLeft()'>Move Left</button> 
-		<button type='button' onclick='moveRight()'>Move Right</button> 
-
-	
-		
     </body>
 </html>
