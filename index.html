@@ -2,33 +2,32 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>hello phaser!</title>
-        <script src="phaser.min.js"></script>
+        <title>Test</title>
+		<script type="text/javascript">
+			var sqrRight = 0;
+			var MOVE_SPEED = 25;
+			function moveLeft(){
+				square = document.getElementById('square');
+				sqrRight = sqrRight-10;
+				square.style.left = sqrRight +'px';
+			}
+			function moveRight(){
+				square = document.getElementById('square');
+				sqrRight = sqrRight+10;
+				square.style.left = sqrRight +'px';
+			}
+		</script>
     </head>
     <body>
 
-    <script type="text/javascript">
+		<div id='square' style='background-color:#000000;width:50px;height:50px;position:relative'>
+	
+		</div>
+		
+		<button type='button' onclick='moveLeft()'>Move Left</button> 
+		<button type='button' onclick='moveRight()'>Move Right</button> 
 
-    window.onload = function() {
-
-        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create });
-
-        function preload () {
-
-            game.load.image('logo', 'phaser.png');
-
-        }
-
-        function create () {
-
-            var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
-            logo.anchor.setTo(0.5, 0.5);
-
-        }
-
-    };
-
-    </script>
-
+	
+		
     </body>
 </html>
