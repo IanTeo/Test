@@ -12,6 +12,14 @@
 		<tr><td width='50' height='50' id='t31' /><td width='50' height='50' id='t32' /><td width='50' height='50' id='t33'/><td width='50' height='50' id='t34' /><td width='50' height='50' id='t35' /></tr>
 		</table>
 		
+		<table border='1'>
+		<tr>
+		<td width='50' height='50' id='blueQty' style="background-color: blue;">0</td>
+		<td width='50' height='50' id='redQty' style="background-color: red">0</td>
+		<td width='50' height='50' id='greenQty' style="background-color: green">0</td>
+		</tr>
+		</table>
+		
 		
 		<button type='button' style='width:100px;margin-left:50px' onclick='writeFunction("moveUp();")'>Move Up</button> <br />
 		<button type='button' style='width:100px' onclick='writeFunction("moveLeft();")'>Move Left</button> 
@@ -26,10 +34,12 @@
 		</div>
 		
 		<script type="text/javascript">
-			var sqrRight = 0;
-			var MOVE_SPEED = 25;
-			var curRow = 2;
-			var curCol = 3;
+			var unitCount = [ 1, 1, 1, 1, 1, 1 ]; //index 0,1,2 is player1. index 3,4,5 is player2.
+			var unitType = [ 'blue', 'red', 'green', 'blue', 'red', 'green' ]; //3 player1 unit, 3 player2 unit
+			var row1Tracker = [ -1, -1, -1, -1, -1];
+			var row2Tracker = [ -1, -1, -1, -1, -1];
+			var row3Tracker = [ -1, -1, -1, -1, -1]; // -1 means no unit
+			var unitTracker = [row1Tracker, row2Tracker, row3Tracker];
 			var funcText = "";
 			function loadSquare(newRow, newCol){
 				var oldPosition = document.getElementById('t' + curRow + '' + curCol);
@@ -38,6 +48,72 @@
 				curCol = newCol;
 				var newPosition = document.getElementById('t' + curRow + '' + curCol);
 				newPosition.style.backgroundColor = '#000000';
+			}
+			function summonUnit(uIndex, row, player){
+				if(unitCount[uIndex] > 0 && unitTracker[row-1][0] == -1){
+					//var newPosition = document.getElementById('t' + row + '1');
+					//newPosition.style.backgroundColor = unitType[uIndex];
+					if(player == 1){
+						unitTracker[row-1][0] = uIndex;
+						unitCount[uIndex] = unitCount[uIndex]-1;
+					}
+					else{//PLZ FIX LATER
+						unitTracker[row-1][unitTracker[0].length-1] = uIndex;
+						
+					}
+					updateUnitCount();
+				}
+				else{
+					alert("SOMETHING IS IN THE WAY!");
+				}
+			}
+			function displayAllUnits(){
+				for(i=0;i<unitTracker.length;i++){
+					for(j=0;j<unitTracker[i].length;j++){
+						if(unitTracker[i][j] != -1){
+							var newPosition = document.getElementById('t' + (i+1) + '' + (j+1));
+							newPosition.style.backgroundColor = unitType[unitTracker[i][j]];
+						}
+						else{
+							var newPosition = document.getElementById('t' + (i+1) + '' + (j+1));
+							newPosition.style.backgroundColor = '';
+						}
+					}
+				}
+			}
+			
+			function moveAllUnits(){
+				var tempUnitTracker = [[-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1]]
+				alert(unitTracker);
+				for(i=0;i<unitTracker.length;i++){
+					for(j=0;j<unitTracker[i].length;j++){
+						//Move right if unit is player1
+						if(unitTracker[i][j] == 0 || unitTracker[i][j] == 1 || unitTracker[i][j] == 2 ){
+							if(j < unitTracker[i].length-1){
+								tempUnitTracker[i][j+1] = unitTracker[i][j];
+							}
+							else{
+								alert("YOU WIN");
+							}
+						}
+						//Move left if unit is player2
+						if(unitTracker[i][j] == 3 || unitTracker[i][j] == 4 || unitTracker[i][j] == 5 ){
+							if(j > 0){
+								tempUnitTracker[i][j-1] = unitTracker[i][j];
+							}
+							else{
+								alert("YOU LOSE");
+							}
+						}
+					}
+				}
+				unitTracker = tempUnitTracker.slice();
+				displayAllUnits();
+			}
+			function updateUnitCount(){
+				document.getElementById('blueQty').innerHTML = unitCount[0];
+				document.getElementById('redQty').innerHTML = unitCount[1];
+				document.getElementById('greenQty').innerHTML = unitCount[2];
 			}
 			function moveLeft(){
 				var newCol;
@@ -77,12 +153,19 @@
 				var script=document.createElement('script');
 				script.type='text/javascript';
 				script.innerHTML = "function runFunction(){" + funcText + "}";
-				//script.src=url;
 
-				document.body.appendChild(script);
+				document.body.appendChld(script);
 			}
 			
-			loadSquare(curRow, curCol);
+			updateUnitCount();
+			summonUnit(2,1,1);
+			summonUnit(4,2,2);
+			displayAllUnits();
+			moveAllUnits();
+			moveAllUnits();
+			moveAllUnits();
+			moveAllUnits();
+			moveAllUnits();
 		</script>
     </body>
 </html>
