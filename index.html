@@ -14,17 +14,31 @@
 		
 		<table border='1'>
 		<tr>
-		<td width='50' height='50' id='blueQty' style="background-color: blue;">0</td>
-		<td width='50' height='50' id='redQty' style="background-color: red">0</td>
-		<td width='50' height='50' id='greenQty' style="background-color: green">0</td>
+		<td width='50' height='50' id='blueQty1' style="background-color: blue;">0</td>
+		<td width='50' height='50' id='redQty1' style="background-color: red">0</td>
+		<td width='50' height='50' id='greenQty1' style="background-color: green">0</td>
+		<td width='50' height='50' style=""></td>
+		<td width='50' height='50' id='blueQty2' style="background-color: blue;">0</td>
+		<td width='50' height='50' id='redQty2' style="background-color: red">0</td>
+		<td width='50' height='50' id='greenQty2' style="background-color: green">0</td>
 		</tr>
 		</table>
 		
-		
-		<button type='button' style='width:100px;margin-left:50px' onclick='writeFunction("moveUp();")'>Move Up</button> <br />
-		<button type='button' style='width:100px' onclick='writeFunction("moveLeft();")'>Move Left</button> 
-		<button type='button' style='width:100px' onclick='writeFunction("moveRight();")'>Move Right</button> <br />
-		<button type='button' style='width:100px;margin-left:50px' onclick='writeFunction("moveDown();")'>Move Down</button> <br /> 
+		<select id="tb_unit">
+		  <option value="0">Blue</option>
+		  <option value="1">Red</option>
+		  <option value="2">Green</option>
+		  <option value="3">Enemy Blue</option>
+		  <option value="4">Enemy Red</option>
+		  <option value="5">Enemy Green</option>
+		</select>
+		<select id="tb_row">
+		  <option value="1">Row 1</option>
+		  <option value="2">Row 2</option>
+		  <option value="3">Row 3</option>
+		</select>
+		<button type='button' style='width:100px' onclick='summonButtonClick()'>Summon</button> <br />
+		<button type='button' style='width:100px' onclick='endTurn()'>End Turn</button><br /> 
 		
 		<button type='button' style='width:100px' onclick='submitFunction()'>Create Script</button>
 		<button type='button' style='width:100px' onclick='runFunction()'>Run Script</button> <br />
@@ -36,35 +50,50 @@
 		<script type="text/javascript">
 			var unitCount = [ 1, 1, 1, 1, 1, 1 ]; //index 0,1,2 is player1. index 3,4,5 is player2.
 			var unitType = [ 'blue', 'red', 'green', 'blue', 'red', 'green' ]; //3 player1 unit, 3 player2 unit
-			var row1Tracker = [ -1, -1, -1, -1, -1];
-			var row2Tracker = [ -1, -1, -1, -1, -1];
-			var row3Tracker = [ -1, -1, -1, -1, -1]; // -1 means no unit
-			var unitTracker = [row1Tracker, row2Tracker, row3Tracker];
+			var fieldRow = 3;//Hardcoded for now.. need to make javascript to display table using this value
+			var fieldCol = 5;
+			var unitTracker = createEmptyFieldArray();
 			var funcText = "";
-			function loadSquare(newRow, newCol){
-				var oldPosition = document.getElementById('t' + curRow + '' + curCol);
-				oldPosition.style.backgroundColor = '#FFFFFF';
-				curRow = newRow;
-				curCol = newCol;
-				var newPosition = document.getElementById('t' + curRow + '' + curCol);
-				newPosition.style.backgroundColor = '#000000';
+			function createEmptyFieldArray(){
+				var fieldArray = [];
+				for(i=0;i<fieldRow;i++){
+					var arrayRow = [];
+					for(j=0;j<fieldCol;j++){
+						arrayRow.push(-1);//-1 means no unit
+					}
+					fieldArray.push(arrayRow);
+				}
+				return fieldArray;
 			}
-			function summonUnit(uIndex, row, player){
-				if(unitCount[uIndex] > 0 && unitTracker[row-1][0] == -1){
-					//var newPosition = document.getElementById('t' + row + '1');
-					//newPosition.style.backgroundColor = unitType[uIndex];
-					if(player == 1){
+
+			function endTurn(){
+				moveAllUnits();
+				displayAllUnits();
+			}
+			function summonButtonClick(){
+				var unit = document.getElementById('tb_unit').value;
+				var row = document.getElementById('tb_row').value;
+				summonUnit(unit, row);
+			}
+			function summonUnit(uIndex, row){
+				if(unitCount[uIndex] > 0){
+					//Summon for player1 on left of field
+					if(uIndex >= 0 && uIndex < 3 && unitTracker[row-1][0] == -1){
 						unitTracker[row-1][0] = uIndex;
 						unitCount[uIndex] = unitCount[uIndex]-1;
 					}
-					else{//PLZ FIX LATER
+					//Summon for player2 on right of field
+					else if(uIndex >= 3 && uIndex < 6 && unitTracker[row-1][unitTracker[0].length-1] == -1){
 						unitTracker[row-1][unitTracker[0].length-1] = uIndex;
-						
+						unitCount[uIndex] = unitCount[uIndex]-1;
+					}
+					else{
+						alert("SOMETHING IS IN THE WAY!");
 					}
 					updateUnitCount();
 				}
 				else{
-					alert("SOMETHING IS IN THE WAY!");
+					alert("NOT ENOUGH MANA!");
 				}
 			}
 			function displayAllUnits(){
@@ -83,8 +112,7 @@
 			}
 			
 			function moveAllUnits(){
-				var tempUnitTracker = [[-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1]]
-				alert(unitTracker);
+				var tempUnitTracker = createEmptyFieldArray();
 				for(i=0;i<unitTracker.length;i++){
 					for(j=0;j<unitTracker[i].length;j++){
 						//Move right if unit is player1
@@ -111,37 +139,12 @@
 				displayAllUnits();
 			}
 			function updateUnitCount(){
-				document.getElementById('blueQty').innerHTML = unitCount[0];
-				document.getElementById('redQty').innerHTML = unitCount[1];
-				document.getElementById('greenQty').innerHTML = unitCount[2];
-			}
-			function moveLeft(){
-				var newCol;
-				if(curCol != 1){
-					newCol = curCol-1;
-					loadSquare(curRow, newCol);
-				}
-			}
-			function moveRight(){
-				var newCol;
-				if(curCol != 5){
-					newCol = curCol+1;
-					loadSquare(curRow, newCol);
-				}
-			}
-			function moveUp(){
-				var newRow;
-				if(curRow != 1){
-					newRow = curRow-1;
-					loadSquare(newRow, curCol);
-				}
-			}
-			function moveDown(){
-				var newRow;
-				if(curRow != 3){
-					newRow = curRow+1;
-					loadSquare(newRow, curCol);
-				}
+				document.getElementById('blueQty1').innerHTML = unitCount[0];
+				document.getElementById('redQty1').innerHTML = unitCount[1];
+				document.getElementById('greenQty1').innerHTML = unitCount[2];
+				document.getElementById('blueQty2').innerHTML = unitCount[3];
+				document.getElementById('redQty2').innerHTML = unitCount[4];
+				document.getElementById('greenQty2').innerHTML = unitCount[5];
 			}
 			
 			function writeFunction(func){
@@ -158,14 +161,7 @@
 			}
 			
 			updateUnitCount();
-			summonUnit(2,1,1);
-			summonUnit(4,2,2);
 			displayAllUnits();
-			moveAllUnits();
-			moveAllUnits();
-			moveAllUnits();
-			moveAllUnits();
-			moveAllUnits();
 		</script>
     </body>
 </html>
