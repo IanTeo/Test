@@ -50,8 +50,10 @@
 		<script type="text/javascript">
 			var unitCount = [ 1, 1, 1, 1, 1, 1 ]; //index 0,1,2 is player1. index 3,4,5 is player2.
 			var unitType = [ 'blue', 'red', 'green', 'blue', 'red', 'green' ]; //3 player1 unit, 3 player2 unit
-			var fieldRow = 3;//Hardcoded for now.. need to make javascript to display table using this value
+			var fieldRow = 3;//Hardcoded for now.. need to make javascript to display field using this value
 			var fieldCol = 5;
+			var summonBayP1 = createEmptySummonBay();
+			var summonBayP2 = createEmptySummonBay();
 			var unitTracker = createEmptyFieldArray();
 			var funcText = "";
 			function createEmptyFieldArray(){
@@ -65,6 +67,14 @@
 				}
 				return fieldArray;
 			}
+			
+			function createEmptySummonBay(){
+				var summonBay = [];
+				for(i=0;i<fieldRow;i++){
+					summonBay.push(-1);//-1 means no unit
+				}
+				return summonBay;
+			}
 
 			function endTurn(){
 				moveAllUnits();
@@ -73,8 +83,62 @@
 			function summonButtonClick(){
 				var unit = document.getElementById('tb_unit').value;
 				var row = document.getElementById('tb_row').value;
-				summonUnit(unit, row);
+				summonUnitIntoBay(unit, row);
 			}
+			function summonUnitIntoBay(uIndex, row){
+				if(unitCount[uIndex] > 0){
+					//Summon for player1 on left of field
+					if(uIndex >= 0 && uIndex < 3 && unitTracker[row-1][0] == -1){
+						summonBayP1[row-1] = uIndex;
+						unitCount[uIndex] = unitCount[uIndex]-1;
+					}
+					//Summon for player2 on right of field
+					else if(uIndex >= 3 && uIndex < 6 && unitTracker[row-1][unitTracker[0].length-1] == -1){
+						summonBayP2[row-1] = uIndex;
+						unitCount[uIndex] = unitCount[uIndex]-1;
+					}
+					else{
+						alert("ONLY 1 UNIT CAN BE SUMMONED PER ROW PER TURN");
+					}
+					updateUnitCount();
+				}
+				else{
+					alert("NOT ENOUGH MANA!");
+				}
+			}
+			function summonAllUnitsFromBay(){
+				for(i=0;i<summonBayP1.length;i++){
+					if(summonBayP1[i] != -1){
+						unitTracker[i][0] = summonBayP1[i];
+					}
+				}
+				for(i=0;i<summonBayP2.length;i++){
+					if(summonBayP2[i] != -1){
+						unitTracker[i][fieldCol-1] = summonBayP2[i];
+					}
+				}
+				summonBayP1 = createEmptySummonBay();
+				summonBayP2 = createEmptySummonBay();
+			}
+			function fight(p1, p2){//How to tell when 2 units will meet? (insert p2 with -3!)
+				if(p1 == p2){
+					return 0;//draw
+				}
+				else if(getNextUnitIndex(p1) == p2){
+					return 1;//p1 win
+				}
+				else{
+					return 2;//p2 win
+				}
+			}
+			function getNextUnitIndex(unit){
+				unit += 1;
+				if(unit == 3){
+					unit = 0;
+				}
+				return unit;
+			}
+			
 			function summonUnit(uIndex, row){
 				if(unitCount[uIndex] > 0){
 					//Summon for player1 on left of field
@@ -136,6 +200,7 @@
 					}
 				}
 				unitTracker = tempUnitTracker.slice();
+				summonAllUnitsFromBay();
 				displayAllUnits();
 			}
 			function updateUnitCount(){
