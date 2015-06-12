@@ -120,15 +120,38 @@
 				summonBayP1 = createEmptySummonBay();
 				summonBayP2 = createEmptySummonBay();
 			}
-			function fight(p1, p2){//How to tell when 2 units will meet? (insert p2 with -3!)
-				if(p1 == p2){
+			
+			function checkBattle(tempUnitTracker){
+				for(i=0;i<unitTracker.length;i++){
+					for(j=0;j<unitTracker[i].length;j++){
+						if(unitTracker[i][j] != -1){
+							if(tempUnitTracker[i][j] != -1){
+								var status = fight(unitTracker[i][j],tempUnitTracker[i][j]);
+								if(status == 1){
+									//Destroy defender
+								}
+								else if(status == 2){
+									//Destroy attacker
+								}
+								else{
+									//Destroy both
+								}
+							}
+						}
+					}
+				}
+			}
+			function fight(attacker, defender){//How to tell when 2 units will meet?
+				if(attacker>2){ attacker -= 3 }
+				if(defender>2){ defender -= 3}
+				if(attacker == defender){
 					return 0;//draw
 				}
-				else if(getNextUnitIndex(p1) == p2){
-					return 1;//p1 win
+				else if(getNextUnitIndex(attacker) == defender){
+					return 1;//attacker win
 				}
 				else{
-					return 2;//p2 win
+					return 2;//defender win
 				}
 			}
 			function getNextUnitIndex(unit){
@@ -177,6 +200,7 @@
 			
 			function moveAllUnits(){
 				var tempUnitTracker = createEmptyFieldArray();
+				//Move P1
 				for(i=0;i<unitTracker.length;i++){
 					for(j=0;j<unitTracker[i].length;j++){
 						//Move right if unit is player1
@@ -188,6 +212,12 @@
 								alert("YOU WIN");
 							}
 						}
+					}
+				}
+				//Compare TempUnitTracker and UnitTracker
+				//Move P2
+				for(i=0;i<unitTracker.length;i++){
+					for(j=0;j<unitTracker[i].length;j++){
 						//Move left if unit is player2
 						if(unitTracker[i][j] == 3 || unitTracker[i][j] == 4 || unitTracker[i][j] == 5 ){
 							if(j > 0){
